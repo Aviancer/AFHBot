@@ -1,0 +1,5 @@
+require 'afhbot/output-log'
+require 'afhbot/parser-config'
+require 'afhbot/command'
+require 'afhbot/client-discord'
+require 'afhbot/modules/group'

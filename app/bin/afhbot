@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+require 'afhbot'
+
+def main
+
+  log = AFHBot::Log.new(debug: false)
+  config = AFHBot::Config.new(log, "data/config.yml")
+
+  if config.get.has_key?('debug') 
+    log.debug = config.get['debug']
+  end
+
+  discord_client = AFHBot::DiscordClient.new(log, config)
+  discord_client.register(config.get['groupmodule'], AFHBot::Group)
+  discord_client.run
+
+end
+
+main
