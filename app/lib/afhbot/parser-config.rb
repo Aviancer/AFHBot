@@ -19,7 +19,7 @@ module AFHBot
 
     def load(file)
       @log.info("Loading configuration file (#{file})")
-      @settings = YAML.load(File.read(file))
+      @settings = YAML.safe_load(File.read(file))
     end
 
     def get

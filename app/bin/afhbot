@@ -4,6 +4,7 @@ require 'afhbot'
 
 def main
 
+
   log = AFHBot::Log.new(debug: false)
   config = AFHBot::Config.new(log, "data/config.yml")
 
@@ -12,7 +13,14 @@ def main
   end
 
   discord_client = AFHBot::DiscordClient.new(log, config)
-  discord_client.register(config.get['groupmodule'], AFHBot::Group)
+
+  if ARGV.include? 'register'
+    discord_client.register_commands(config.get['groupmodule'], AFHBot::Group)
+  elsif ARGV.include? 'unregister'
+    discord_client.unregister_commands(config.get['groupmodule'], AFHBot::Group)
+  end
+
+  discord_client.initialize_commands(config.get['groupmodule'], AFHBot::Group)
   discord_client.run
 
 end

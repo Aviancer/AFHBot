@@ -29,17 +29,15 @@ module AFHBot
        AFHBot::Command.new(
          :addrole, 
          { :description => '<role1> <role2..> Add role(s) for yourself',
-           :usage => '!addrole <role1> <role2..>',
-           :min_args => 1,
-           :max_args => 20 }, 
+           :args => { :roles => 'Role(s) to add' }
+         },
          addrole(log, moduleconfig)),
        AFHBot::Command.new(
          :removerole, 
          { :description => '<role1> <role2..> Remove role(s) from yourself',
-           :usage => '!removerole <role1> <role2..>',
-           :min_args => 1,
-           :max_args => 20 }, 
-         removerole(log, moduleconfig) )
+           :args => { :roles => 'Role(s) to remove' }
+         },
+         removerole(log, moduleconfig))
       ]
     end
 
@@ -53,15 +51,14 @@ module AFHBot
     end
 
     def self._event2author(event)
-      "#{event.author.name}##{event.author.discriminator}@#{event.channel.name}"
+      "#{event.user.username}##{event.user.discriminator}@#{event.channel.name}"
     end
 
     def self._logevent(log, method, event, level: :debug)
       # Max length willing to log of message is 512 characters.
-      if event.message.content.length > 512
-        message = event.message.content[0,512] + "..."
-      else
-        message = event.message.content
+      message = event.options.inspect() # Will contain each event 'option' parameter
+      if message.length > 512
+        message = message[0,512] + "..."
       end
       # send dynamically calls the method in log defined by 'level', eg. log.debug
       log.send(level, "AFHBot::Group::#{method} event: srv(#{event.channel.server.name}) src(#{_event2author(event)}) msg(#{message})")
@@ -70,7 +67,7 @@ module AFHBot
     def self._catcherror(log, method, event, msg, no_chat: false)
       log.error([msg, "-- Trace follows:"].join(" "))
        _logevent(log, method, event, level: :error)
-       event << "Error: #{msg}" unless no_chat
+       event.respond(content: "Error: #{msg}") unless no_chat
     end
 
     def self._hasrole(moduleconfig, event, name)
@@ -82,11 +79,19 @@ module AFHBot
         return nil unless _permitcheck(moduleconfig, event)
         _logevent(log, __method__, event)
 
-        event << '[ Available subscription roles ]'
-        event << '----------------------------------------------------'
+        roles_msg = ""
         moduleconfig['subscription_roles'].each do |key, value|
-          event << "#{key} | #{value['desc']}"
+          roles_msg << "#{key} | #{value['desc']}"
         end
+
+        event.respond(content: <<~STR)
+        ```
+        [ Available subscription roles ]
+        ----------------------------------------------------
+        #{roles_msg}
+        ```
+        STR
+
         nil # Each lambda should return nil at the end.
       end
     end
@@ -114,7 +119,8 @@ module AFHBot
     end
 
     def self.addrole(log, moduleconfig)
-      ->(event, *args) do
+      ->(event) do
+        args = event.options['roles'].split(' ')
         return nil unless _permitcheck(moduleconfig, event)
         _logevent(log, __method__, event)
 
@@ -134,22 +140,23 @@ module AFHBot
 
         if results.success.any?
           log.info("Added roles(#{results.success.join(",")}) for (#{_event2author(event)})")
-          event << "Added roles(#{results.success.join(",")})." 
+          event.respond(content: "Added roles(#{results.success.join(",")}).")
         end
           
         if results.error.any?
-          event << "Got error when adding roles(#{results.error.join(",")})." 
+          event.respond(content: "Got error when adding roles(#{results.error.join(",")}).")
         end
 
         if results.unchanged.any?
-          event << "The following roles are unchanged (#{results.unchanged.join(",")})." 
+          event.respond(content: "The following roles are unchanged (#{results.unchanged.join(",")}).")
         end
         nil
       end
     end
 
     def self.removerole(log, moduleconfig)
-      ->(event, *args) do
+      ->(event) do
+        args = event.options['roles'].split(' ')
         return nil unless _permitcheck(moduleconfig, event)
         _logevent(log, __method__, event)
 
@@ -169,15 +176,15 @@ module AFHBot
 
         if results.success.any?
           log.info("Removed roles(#{results.success.join(",")}) for (#{_event2author(event)})")
-          event << "Removed roles(#{results.success.join(",")})." 
+          event.respond(content: "Removed roles(#{results.success.join(",")}).")
         end
           
         if results.error.any?
-          event << "Got error when removing roles(#{results.error.join(",")})." 
+          event.respond(content: "Got error when removing roles(#{results.error.join(",")}).")
         end
 
         if results.unchanged.any?
-          event << "The following roles are unchanged (#{results.unchanged.join(",")})." 
+          event.respond(content: "The following roles are unchanged (#{results.unchanged.join(",")}).")
         end
         nil
       end
