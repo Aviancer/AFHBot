@@ -81,7 +81,7 @@ module AFHBot
 
         roles_msg = ""
         moduleconfig['subscription_roles'].each do |key, value|
-          roles_msg << "#{key} | #{value['desc']}"
+          roles_msg << "#{key} | #{value['desc']}\n"
         end
 
         event.respond(content: <<~STR)
