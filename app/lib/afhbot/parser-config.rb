@@ -9,7 +9,7 @@ module AFHBot
       @settings = Hash.new
 
       unless file.nil? 
-        if File.exists?(file) 
+        if File.exist?(file) 
           self.load(file)
         else
           raise IOError.new("Unable to load configuration, file(#{file}) doesn't exist.")
