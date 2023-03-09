@@ -2,32 +2,26 @@
 
 require 'afhbot'
 
-def main
-
-  log = AFHBot::Log.new(debug: false)
-  config = AFHBot::Config.new(log, "data/config.yml")
-
-  if config.get.has_key?('debug') 
-    log.debug = config.get['debug']
-  end
-
-
+def run_twitch(log, config)
   # Twitch
   config_twitch = config.get["twitch"]
   main_queue = Queue.new
   # Make another queue to talk to twitch_client, one is used to talk to us from all the clients.
 
   client_queue = Queue.new
-  sock = AFHBot::TLSSocket.new(log, config_twitch["server_addr"], config_twitch["server_port"])
-  twitch_proto = AFHBot::TwitchProto.new(log, sock, config_twitch)
+  twitch_sock = AFHBot::TLSSocket.new(log, config_twitch["server_addr"], config_twitch["server_port"])
+  twitch_proto = AFHBot::TwitchProto.new(log, twitch_sock, config_twitch)
   twitch_client = AFHBot::TwitchClient.new(log, {:tx_queue=>main_queue, :rx_queue=>client_queue}, twitch_proto) 
 
   Thread.abort_on_exception = true
-  tc = Thread.new { twitch_client.client_thread }
-  #tc.join # TODO: Maybe we don't want to join here?
-  #sock.close
+  Thread.new {
+    Thread.current.name = "Twitch" 
+    twitch_client.initialize_commands(config.get['twitch'], AFHBot::TwitchResponses)
+    twitch_client.client_thread
+  }
+end
 
-
+def run_discord(log, config)
   # Discord
   discord_client = AFHBot::DiscordClient.new(log, config)
 
@@ -39,6 +33,31 @@ def main
 
   discord_client.initialize_commands(config.get['groupmodule'], AFHBot::DiscordGroup)
   discord_client.run
+end
+
+def main
+
+  Thread.current.name = "Main"
+
+  log = AFHBot::Log.new(debug: false)
+  config = AFHBot::Config.new(log, "data/config.yml")
+
+  if config.get.has_key?('debug') 
+    log.debug = config.get['debug']
+  end
+
+  # Runs in backgrounded thread
+  discord_bot = run_discord(log, config)
+
+  # Start Twitch chat thread if not alive
+  twitch_thread = nil
+  loop do
+    if (twitch_thread.nil? or not twitch_thread.alive?)
+      log.info("Starting Twitch chat thread")
+      twitch_thread = run_twitch(log, config)
+    end
+    sleep(3)
+  end
 
 end
 

@@ -1,6 +1,6 @@
-module AFHBot
+require 'time'
 
-# Todo: Rate limiting
+module AFHBot
 
   class TwitchProto
 
@@ -22,6 +22,27 @@ module AFHBot
         [\r\n]*$                                   # End
       }x
       @msg_buffer = ""
+
+      # Rate limiting
+      @msg_rate = 0                                # How many messges have we sent recently
+      @msg_rate_timer = Time.now                   # Time since last limit period started
+    end
+
+    # Simple instance rate limit to 5 messages per 30 seconds (Twitch stated limit)
+    def rate_limited?
+      if Time.now - @msg_rate_timer > 30
+        @msg_rate_timer = Time.now
+        @msg_rate = 0
+      end
+
+      @msg_rate += 1
+
+      if @msg_rate <= 5
+        return false # Rate OK
+      elsif @msg_rate == 6
+        @log.warning("Hit Twitch rate limit of 5 messages in 30 seconds. Discarding responses.")
+      end
+      return true
     end
   
     # <message>  ::= [':' <prefix> <SPACE> ] <command> <params> <crlf>
@@ -40,6 +61,15 @@ module AFHBot
       channel = params_parts.first.split(" = ").last
       members = params_parts.last.split(" ")
       return channel, members
+    end
+
+    def parseparams_privmsg(params)
+      # <parsed_msg> #aviancer :Test7 more words
+      params_parts = params.
+                     partition(" :")
+      channel = params_parts.first
+      message = params_parts.last
+      return channel, message
     end
   
     def login
@@ -73,7 +103,9 @@ module AFHBot
     end
   
     def msg(target, message)
-      @socket.puts "PRIVMSG #{target} :#{message}"
+      if not self.rate_limited?
+        @socket.puts "PRIVMSG #{target} :#{message}"
+      end
     end
   
     def mode(target, flags)

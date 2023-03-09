@@ -9,10 +9,11 @@ module AFHBot
       @twitch = twitch
       
       @connect_delay = 1
+
+      @event_handlers = {}
     end
 
     def client_thread
-    
       loop do
         sleep @connect_delay if @connect_delay > 1
     
@@ -48,12 +49,27 @@ module AFHBot
             channel, members = @twitch.parseparams_members(parsed[:params])
             @log.info("Members on channel %s: %s" % [channel, members])
           end
+
           #@twitch.queue << message
+          handle(parsed)
         end
       end
+    end
+
+    def handle(event)
+        @event_handlers.fetch(event[:command]).call(@twitch, event)
+    rescue KeyError
+        @log.debug("Unhandled event: #{event}")
+    end
     
+    def initialize_commands(moduleconfig, controller)
+        @log.info("Initializing module #{controller}")
+        controller.commands(@log, moduleconfig).each do |command|
+            @log.info("- Adding handler for message type #{command.name}")
+
+            @event_handlers[command.name] = command.block
+        end
     end
 
   end
-
 end

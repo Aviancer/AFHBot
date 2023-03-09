@@ -53,7 +53,7 @@ module AFHBot
 
     def run
       @log.info("Connecting to Discord service")
-      @discord_bot.run
+      @discord_bot.run(background=true)
     end
 
     def join
