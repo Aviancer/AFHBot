@@ -1,6 +1,6 @@
 module AFHBot
 
-  module Group
+  module DiscordGroup
     
     UNDEFINED_ROLE = 0x01
     UNCHANGED_ROLE = 0x02
