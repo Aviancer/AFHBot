@@ -1,6 +1,25 @@
 module AFHBot
 
   module TwitchResponses
+
+    class Responses
+
+      @@allowed_methods = ['hello','ping']
+
+      def self.allowed_method?(method_name)
+        return true if @@allowed_methods.include? method_name
+        false 
+      end
+ 
+      def self.hello(twitch, msg)
+        twitch.msg(msg['to'], "Hello #{msg['from']}!")
+      end
+
+      def self.ping(twitch, msg)
+        twitch.msg(msg['to'], "Pong!")
+      end
+
+    end
     
     def self.commands(log, moduleconfig)
       [
@@ -15,13 +34,22 @@ module AFHBot
       # twitch is an instantiated TwitchProto object
       ->(twitch, event, *args) do # stabby lambda
         # :aviancer!aviancer@aviancer.tmi.twitch.tv
-        msg_from = event[:prefix].delete_prefix(":").split('!').first
-        msg_to, msg_text = twitch.parseparams_privmsg(event[:params])
+        msg = {
+          'from' => event[:prefix].delete_prefix(":").split('!').first
+        }
+        msg['to'], msg['text'] = twitch.parseparams_privmsg(event[:params])
 
-        if msg_text.chars.first == moduleconfig["command-prefix"]
-          case msg_text
-          when "!test"
-            twitch.msg(msg_to, "Self-test: OK") # TODO: What if message isn't to a channel?
+        # TODO: What if message isn't to a channel?
+        if msg['text'].chars.first == moduleconfig["command-prefix"]
+          msg['command'] = 
+            msg['text'].delete_prefix(moduleconfig["command-prefix"]) # Strip command prefix -> method name
+            .split(" ")
+            .first
+            .downcase
+          if AFHBot::TwitchResponses::Responses.allowed_method?(msg['command'])
+            AFHBot::TwitchResponses::Responses.send(msg['command'], twitch, msg)
+          else
+            log.debug("Unrecognized Twitch chat command: #{msg['command']}")
           end
         end
 

@@ -19,6 +19,7 @@ module AFHBot
       @tls_context = OpenSSL::SSL::SSLContext.new()
       @tls_context.verify_mode = OpenSSL::SSL::VERIFY_PEER
       @tls_context.cert_store = @cert_store
+      # https://www.tenable.com/plugins/nessus/156899 (2023.03.09)
       @tls_context.ssl_version = :TLSv1_2
       @tls_context.ciphers = [
         "ECDHE-ECDSA-AES256-GCM-SHA384",

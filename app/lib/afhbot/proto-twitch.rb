@@ -23,7 +23,7 @@ module AFHBot
       }x
       @msg_buffer = ""
 
-      # Rate limiting
+      # Message rate limiting
       @msg_rate = 0                                # How many messges have we sent recently
       @msg_rate_timer = Time.now                   # Time since last limit period started
     end
