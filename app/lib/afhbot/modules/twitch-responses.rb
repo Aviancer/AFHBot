@@ -20,7 +20,7 @@ module AFHBot
       end
 
       def self.discord(log, twitch, msg)
-        twitch.msg(msg['to'], "Link to Aviancer's Discord: https://discord.gg/WQHju3U")
+        twitch.msg(msg['to'], "Invite to Aviancer's Discord: https://discord.gg/WQHju3U")
       end
 
       def self.quote(log, twitch, msg)
@@ -71,7 +71,7 @@ module AFHBot
         midi = patterns.map do |key, regexp|
           result = doc.match(regexp)
           # If match found, return match. Otherwise default.
-          [key, result ? result[1] : "Unknown #{key}"]
+          [key, result ? result[1].strip : "Unknown #{key}"]
         end.to_h
 
         reply = "Midi Radio: #{midi[:url]} -> " \
