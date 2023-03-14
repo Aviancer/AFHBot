@@ -24,27 +24,34 @@ module AFHBot
       @msg_buffer = ""
 
       # Message rate limiting
-      @msg_rate = 0                                # How many messges have we sent recently
-      @msg_rate_timer = Time.now                   # Time since last limit period started
+      @ratelimit_counters = { :PROTO_PRIVMSG => 0 }      # How many messges have we sent recently
+      @ratelimit_timers = { :PROTO_PRIVMSG => Time.now } # Time since last limit period started
     end
 
-    # Simple instance rate limit to 5 messages per 30 seconds (Twitch stated limit)
-    def rate_limited?
-      if Time.now - @msg_rate_timer > 30
-        @msg_rate_timer = Time.now
-        @msg_rate = 0
+    def add_rate_limiter(context)
+      if not @ratelimit_counters.key? context
+        @ratelimit_counters[context] = 0
+        @ratelimit_timers[context] = Time.now
+      end
+    end
+
+    # Simple instanced rate limiter
+    def rate_limited?(context, max, period)
+      if Time.now - @ratelimit_timers[context] > 30
+        @ratelimit_timers[context] = Time.now
+        @ratelimit_counters[context] = 0
       end
 
-      @msg_rate += 1
+      @ratelimit_counters[context] += 1
 
-      if @msg_rate <= 5
+      if @ratelimit_counters[context] <= max
         return false # Rate OK
-      elsif @msg_rate == 6
-        @log.warning("Hit Twitch rate limit of 5 messages in 30 seconds. Discarding responses.")
+      elsif @ratelimit_counters[context] == (max+1)
+        @log.warning("Rate limiter for '#{context}' exceeded limit of #{max} in #{period} seconds.")
       end
       return true
-    end
-  
+    end    
+
     # <message>  ::= [':' <prefix> <SPACE> ] <command> <params> <crlf>
     def parse(message)
       parsed = @msg_pattern.match(message)
@@ -52,6 +59,11 @@ module AFHBot
         @log.error("Malformed message received: %p" % message)
       end
       parsed
+    end
+
+    # Verify channel is in configuration
+    def allowed_channel?(channel)
+      @config['channels'].include?(channel)
     end
 
     def parseparams_members(params)
@@ -103,7 +115,8 @@ module AFHBot
     end
   
     def msg(target, message)
-      if not self.rate_limited?
+      # Simple rate limit to 20 messages per 30 seconds (Twitch stated limit)
+      if not self.rate_limited?(:PROTO_PRIVMSG, 20, 30)
         @socket.puts "PRIVMSG #{target} :#{message}"
       end
     end

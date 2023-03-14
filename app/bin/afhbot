@@ -39,6 +39,11 @@ def main
 
   Thread.current.name = "Main"
 
+  # Timer:
+  #   Maintain list of timers under main thread.
+  #   Allow modules to register functions to the list to call at intervals.
+  #   By default run a timer once, auto-register recurring ones?
+
   log = AFHBot::Log.new(debug: false)
   config = AFHBot::Config.new(log, "data/config.yml")
 

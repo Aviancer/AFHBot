@@ -39,12 +39,12 @@ module AFHBot
         @twitch.server_gets_each do |message|
           parsed = @twitch.parse(message)
           next if parsed.nil? # Discard malformed messages, logged by parser
-          @log.server(parsed)
+          @log.debug(parsed)
       
           case parsed[:command]
           when "PING"
             @twitch.pong(parsed[:params])
-            @log.info("Sent pong %p" % parsed[:params])
+            @log.debug("Sent pong %p" % parsed[:params])
           when "#{AFHBot::TwitchProto::CMD_MEMBERSHIP}"
             channel, members = @twitch.parseparams_members(parsed[:params])
             @log.info("Members on channel %s: %s" % [channel, members])
