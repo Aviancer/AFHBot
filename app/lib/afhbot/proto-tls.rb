@@ -40,7 +40,7 @@ module AFHBot
         @tls_socket = OpenSSL::SSL::SSLSocket.new(@tcp_socket, @tls_context)
         @tls_socket.connect
         @tls_socket.sync_close = true
-      rescue Errno::ERRCONNREFUSED, Errno::ETIMEDOUT => e
+      rescue Errno::ECONNREFUSED, Errno::ETIMEDOUT => e
         return e
       end
 
