@@ -46,6 +46,7 @@ module AFHBot
 
       # 0=OK, otherwise errors
       verify_result = @tls_socket.verify_result
+
       if verify_result != 0
         @errors = Hash.new
         OpenSSL::X509.constants.grep(/^V_(ERR_|OK)/).each do |name|

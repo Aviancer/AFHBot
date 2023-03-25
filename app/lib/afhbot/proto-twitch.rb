@@ -85,7 +85,7 @@ module AFHBot
     end
   
     def login
-      @socket.puts "PASS oauth:#{@config["password"]}"
+      @socket.puts "PASS #{@config["password"]}"
       @socket.puts "NICK #{@config["nickname"]}"
 
       # Login success: :tmi.twitch.tv 001 <user> :Welcome, GLHF!
@@ -133,8 +133,8 @@ module AFHBot
     ### Passthrough functions
     
     def server_connect
-      @log.info("Connecting to #{@config["server_addr"]}:#{@config["server_port"]}") 
-      result = @socket.connect
+      @log.info("Connecting to #{@config["server_addr"]}:#{@config["server_port"]}")
+      return @socket.connect
     end
 
     def server_gets!(length=$/)
