@@ -36,10 +36,9 @@ module AFHBot
 
     def connect
       begin
-        @tcp_socket = TCPSocket.new(@host, @port)
-        @tls_socket = OpenSSL::SSL::SSLSocket.new(@tcp_socket, @tls_context)
-        @tls_socket.connect
+        @tls_socket = OpenSSL::SSL::SSLSocket.open(@host, @port, context: @tls_context)
         @tls_socket.sync_close = true
+        @tls_socket.connect
       rescue Errno::ECONNREFUSED, Errno::ETIMEDOUT => e
         return e
       end
@@ -80,15 +79,15 @@ module AFHBot
     end
 
     def alive?
-      ! @tcp_socket.closed?
+      ! @tls_socket.closed?
     end
 
     def readable?
-      IO.select([@tcp_socket], [], [], 0) != nil
+      IO.select([@tls_socket], [], [], 0) != nil
     end
 
     def writable?
-      IO.select([], [@tcp_socket], [], 0) != nil
+      IO.select([], [@tls_socket], [], 0) != nil
     end
 
   end

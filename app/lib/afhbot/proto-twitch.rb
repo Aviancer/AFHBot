@@ -134,7 +134,11 @@ module AFHBot
     
     def server_connect
       @log.info("Connecting to #{@config["server_addr"]}:#{@config["server_port"]}")
-      return @socket.connect
+      result = @socket.connect
+      if not result
+        @log.error("Failed to connect to Twitch server: #{@socket.status}")
+      end
+      return result
     end
 
     def server_gets!(length=$/)

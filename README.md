@@ -4,3 +4,6 @@
 After this just run `bin/afhbot` under Docker without arguments and it will use the configuration file for all needed options.
 
 (Needs improvement)
+
+# Running as non-root user
+Create a user and group called 'afhbot' on the host machine so that mounted config files can be accessed by the bot.
