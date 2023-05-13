@@ -2,11 +2,11 @@ module AFHBot
 
   class TwitchClient
 
-    def initialize(log, queues, twitch)
+    def initialize(log, queues, config)
       @log = log
       @tx_queue = queues[:tx_queue]
       @rx_queue = queues[:rx_queue]
-      @twitch = twitch
+      @twitch = twitch_proto = AFHBot::TwitchProto.new(@log, config)
       
       @connect_delay = 1
 
@@ -57,9 +57,11 @@ module AFHBot
     end
 
     def handle(event)
+      begin
         @event_handlers.fetch(event[:command]).call(@twitch, event)
-    rescue KeyError
+      rescue KeyError
         @log.debug("Unhandled event: #{event}")
+      end
     end
     
     def initialize_commands(moduleconfig, controller)

@@ -9,9 +9,7 @@ def run_twitch(log, config)
   # Make another queue to talk to twitch_client, one is used to talk to us from all the clients.
 
   client_queue = Queue.new
-  twitch_sock = AFHBot::TLSSocket.new(log, config_twitch["server_addr"], config_twitch["server_port"])
-  twitch_proto = AFHBot::TwitchProto.new(log, twitch_sock, config_twitch)
-  twitch_client = AFHBot::TwitchClient.new(log, {:tx_queue=>main_queue, :rx_queue=>client_queue}, twitch_proto)
+  twitch_client = AFHBot::TwitchClient.new(log, {:tx_queue=>main_queue, :rx_queue=>client_queue}, config_twitch)
 
   Thread.abort_on_exception = true
   Thread.new {

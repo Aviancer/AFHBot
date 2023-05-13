@@ -9,10 +9,10 @@ module AFHBot
 
     attr_accessor :config
   
-    def initialize(log, socket, config)
+    def initialize(log, config)
       @log = log
-      @socket = socket
       @config = config
+      @socket = nil
 
       # Null characters are not valid 
       @msg_pattern = %r{
@@ -133,7 +133,11 @@ module AFHBot
     ### Passthrough functions
     
     def server_connect
-      @log.info("Connecting to #{@config["server_addr"]}:#{@config["server_port"]}")
+
+      @socket.close unless @socket.nil?
+      @socket = AFHBot::TLSSocket.new(@log, @config['server_addr'], @config['server_port'])
+
+      @log.info("Connecting to #{@config['server_addr']}:#{@config['server_port']}")
       result = @socket.connect
       if not result
         @log.error("Failed to connect to Twitch server: #{@socket.status}")
