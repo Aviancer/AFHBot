@@ -133,7 +133,6 @@ module AFHBot
     ### Passthrough functions
     
     def server_connect
-
       @socket.close unless @socket.nil?
       @socket = AFHBot::TLSSocket.new(@log, @config['server_addr'], @config['server_port'])
 
@@ -146,16 +145,20 @@ module AFHBot
     end
 
     def server_gets!(length=$/)
+      connection_alive?
       @msg_buffer = @socket.gets(length)
       @msg_buffer
+    rescue Errno::ECONNRESET
+      raise IOError, "Server socket has closed unexpectedly."
     end
 
     def server_read(length)
+      connection_alive?
       @socket.read(length)
     end
 
     def server_gets_each
-      while @socket.alive?
+      while connection_alive?
         if @socket.readable?
           server_gets!
           yield @msg_buffer
@@ -163,6 +166,14 @@ module AFHBot
           sleep(0.1)
         end
       end
+    end
+
+    def connection_alive?
+      unless @socket.alive?
+        @log.error("Server socket has closed unexpectedly.")
+        raise IOError, "Server socket has closed unexpectedly."
+      end
+      return @socket.alive?
     end
   
   end

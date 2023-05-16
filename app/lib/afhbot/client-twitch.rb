@@ -54,6 +54,8 @@ module AFHBot
           handle(parsed)
         end
       end
+    rescue IOError
+      nil
     end
 
     def handle(event)

@@ -4,6 +4,7 @@ require 'afhbot'
 
 def run_twitch(log, config)
   # Twitch
+  # TODO: Don't start Twitch module if no config given for it.
   config_twitch = config.get["twitch"]
   main_queue = Queue.new
   # Make another queue to talk to twitch_client, one is used to talk to us from all the clients.
