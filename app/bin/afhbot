@@ -4,7 +4,6 @@ require 'afhbot'
 
 def run_twitch(log, config)
   # Twitch
-  # TODO: Don't start Twitch module if no config given for it.
   config_twitch = config.get["twitch"]
   main_queue = Queue.new
   # Make another queue to talk to twitch_client, one is used to talk to us from all the clients.
@@ -53,12 +52,14 @@ def main
   # Runs in backgrounded thread
   discord_bot = run_discord(log, config)
 
-  # Start Twitch chat thread if not alive
+  # Start Twitch chat thread if configured and not alive
   twitch_thread = nil
   loop do
-    if (twitch_thread.nil? or not twitch_thread.alive?)
-      log.info("Starting Twitch chat thread")
-      twitch_thread = run_twitch(log, config)
+    if config.get.has_key?('twitch')
+      if (twitch_thread.nil? or not twitch_thread.alive?)
+        log.info("Starting Twitch chat thread")
+        twitch_thread = run_twitch(log, config)
+      end
     end
     sleep(3)
   end
