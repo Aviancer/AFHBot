@@ -58,6 +58,9 @@ module AFHBot
       if parsed.nil? then
         @log.error("Malformed message received: %p" % message)
       end
+      if message.nil? then
+        raise IOError, "Received nil from network socket"
+      end
       parsed
     end
 
@@ -163,13 +166,14 @@ module AFHBot
           server_gets!
           yield @msg_buffer
         else
-          sleep(0.1)
+          sleep 0.1
         end
       end
     end
 
     def connection_alive?
       unless @socket.alive?
+        @socket.close
         @log.error("Server socket has closed unexpectedly.")
         raise IOError, "Server socket has closed unexpectedly."
       end
