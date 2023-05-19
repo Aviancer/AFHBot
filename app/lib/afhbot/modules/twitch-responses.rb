@@ -61,8 +61,8 @@ module AFHBot
         end
 
         patterns = {
+          :url => /(?:(?<=You are listening to:<br>\n)<a href=")(.{1,100})">/m,
           :length => /Song Play Length:(:? (.{1,20}?))</m,
-          :url => /File URL is(:? (.{1,100}?))<br>/m,
           :system => /Game System:(:? (.{1,30}?))<br>/m,
           :game => /Game Name:(:? (.{1,50}?))<br>/m,
           :title => /Song Title:(:? (.{1,50}?))<br>/m
