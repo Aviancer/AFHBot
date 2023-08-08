@@ -6,7 +6,7 @@ module AFHBot
 
     class Responses
 
-      @@allowed_methods = ['help', 'discord', 'midi']
+      @@allowed_methods = ['help', 'discord', 'lurk' 'midi']
 
       def self.allowed_method?(method_name)
         @@allowed_methods.include? method_name
@@ -21,6 +21,10 @@ module AFHBot
 
       def self.discord(log, twitch, msg)
         twitch.msg(msg['to'], "Invite to Aviancer's Discord: https://discord.gg/WQHju3U")
+      end
+
+      def self.lurk(log, twitch, msg)
+        twitch.msg(msg['to'], "#{msg['from']} is now lurking. Thanks for helping the stream grow! Have a comf time, make sure to say hi if you wanted a reply.")
       end
 
       def self.quote(log, twitch, msg)
