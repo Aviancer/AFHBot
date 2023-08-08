@@ -6,7 +6,7 @@ module AFHBot
 
     class Responses
 
-      @@allowed_methods = ['help', 'discord', 'lurk' 'midi']
+      @@allowed_methods = ['help', 'discord', 'lurk', 'midi']
 
       def self.allowed_method?(method_name)
         @@allowed_methods.include? method_name
