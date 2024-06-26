@@ -6,7 +6,7 @@ module AFHBot
 
     class Responses
 
-      @@allowed_methods = ['help', 'discord', 'lurk', 'midi']
+      @@allowed_methods = ['help', 'discord', 'lurk', 'midi', 'tetris']
 
       def self.allowed_method?(method_name)
         @@allowed_methods.include? method_name
@@ -25,6 +25,10 @@ module AFHBot
 
       def self.lurk(log, twitch, msg)
         twitch.msg(msg['to'], "#{msg['from']} is now lurking. Thanks for helping the stream grow! Have a comf time, make sure to say hi if you wanted a reply.")
+      end
+
+      def self.tetris(log, twitch, msg)
+        twitch.msg(msg['to'], "Drop a sub, make me drop everything and drop blocks for one level of Tetris Effect!")
       end
 
       def self.quote(log, twitch, msg)
