@@ -1,4 +1,4 @@
-# Discord and Twitch bot for managing a community
+# Discord/Twitch bot for managing a community
 Configurable commands and utility bot for Twitch streams and community. Allows reactives for Twitch chat as well as people to manage their own groups on Discord.
 Can also be extended for cross-platform functionality.
 
