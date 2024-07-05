@@ -1,5 +1,5 @@
-# Twitch.tv / Discord community bot
-Configurable commands and utility bot for Aviancer's streams and community. Allows reactives for Twitch chat as well as people to manage their own groups on Discord.
+# Discord and Twitch bot for managing a community
+Configurable commands and utility bot for Twitch streams and community. Allows reactives for Twitch chat as well as people to manage their own groups on Discord.
 Can also be extended for cross-platform functionality.
 
 # Building docker image
