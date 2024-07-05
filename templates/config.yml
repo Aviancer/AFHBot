@@ -1,0 +1,20 @@
+debug: false
+token: DISCORD_BOT_TOKEN 
+
+groupmodule:
+  server_id: SERVER_ID
+  chats_enabled:
+    bot-commands: { id: CHANNEL_ID, desc: "Bot commands channel" }
+  subscription_roles:
+    streams: { id: ROLE_ID, desc: "Receive stream announcements" }
+    flights: { id: ROLE_ID, desc: "Receive flight announcements" }
+
+twitch:
+  server_addr: irc.chat.twitch.tv
+  server_port: 6697
+  nickname: NICKNAME
+  password: OAUTH:TOKEN
+  channels: 
+    - "#CHANNEL"
+  command-prefix: "!"
+
