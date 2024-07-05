@@ -11,7 +11,7 @@ Run `make` to build afhbot.
 Dockerfile is configured to run under 'afhbot' user. Create a user and group called 'afhbot' on the host machine so that mounted config files can be accessed by the bot with those permissions.
 
 ## Create a config file
-Create a config file based on the `templates/config.yml` template. This should be saved outside the Docker image and provided at `/app/data/config.yml` through a bind mount and be owned by a `afhbot` user.
+Create a config file based on the `templates/config.yml` template. This should be saved outside the Docker image and provided at `/app/data/config.yml` through a bind mount and be owned by the `afhbot` user.
 
 ## Registering Discord slash commands 
 `bin/afhbot` needs to be given 'register' as argument to register slash commands on Discord. This needs to be done only once unless the commands are updated.
